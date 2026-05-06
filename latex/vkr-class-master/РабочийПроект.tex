@@ -1,0 +1,229 @@
+\section{Рабочий проект}
+\subsection{Спецификация классов программной системы}
+
+В данном разделе приведено описание основных классов и модулей, разработанных в процессе реализации программной системы. Для каждого класса указаны его назначение, а также перечень методов с модификаторами доступа и кратким описанием. Для модулей, состоящих из набора функций, приводится описание каждой функции.
+
+\subsubsection{Класс User (модель пользователя)}
+
+Класс \texttt{User} (модуль \texttt{models.py}) предназначен для представления учётной записи пользователя в системе. Он наследуется от класса \texttt{UserMixin} библиотеки Flask-Login, что обеспечивает реализацию стандартных методов аутентификации. Класс содержит статические методы для поиска пользователей в базе данных и метод проверки пароля.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Методы класса \texttt{User} (\texttt{models.py})\label{tab:class_user}}\\ \hline
+	\centrow Метод & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:class_user}}
+	\centrow Метод & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{\_\_init\_\_(self, id, username, is\_admin=False)} & public & Конструктор объекта пользователя \\ \hline
+	\texttt{check\_password(self, password, password\_hash)} & public & Проверяет соответствие пароля хешу \\ \hline
+	\texttt{get\_by\_username(db\_manager, username)} & public static & Возвращает объект \texttt{User} по логину \\ \hline
+	\texttt{get\_by\_id(db\_manager, user\_id)} & public static & Возвращает объект \texttt{User} по идентификатору \\ \hline
+\end{xltabular}
+
+\subsubsection{Класс DatabaseManager (менеджер базы данных)}
+
+Класс \texttt{DatabaseManager} (модуль \texttt{connection.py}) управляет жизненным циклом встроенного сервера PostgreSQL, запускаемого через библиотеку pgembed. Он создаёт пул соединений, предоставляет методы получения и возврата соединений, а также корректно завершает работу сервера при остановке приложения.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Методы класса \texttt{DatabaseManager} (\texttt{connection.py})\label{tab:class_dbmanager}}\\ \hline
+	\centrow Метод & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:class_dbmanager}}
+	\centrow Метод & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{\_\_init\_\_(self, data\_dir, db\_name, min\_conn, max\_conn)} & public & Инициализация параметров подключения \\ \hline
+	\texttt{start(self)} & public & Запускает PostgreSQL, создаёт базу данных и пул соединений \\ \hline
+	\texttt{stop(self)} & public & Закрывает пул и останавливает PostgreSQL \\ \hline
+	\texttt{get\_connection(self)} & public & Возвращает свободное соединение из пула \\ \hline
+	\texttt{return\_connection(self, conn)} & public & Возвращает соединение в пул \\ \hline
+	\texttt{\_wait\_for\_server(self, timeout)} & private & Ожидает готовности PostgreSQL \\ \hline
+\end{xltabular}
+
+\subsubsection{Класс MainWindow (главное окно приложения)}
+
+Класс \texttt{MainWindow} (модуль \texttt{gui.py}) реализует графический интерфейс пользователя на библиотеке Tkinter. Он содержит кнопки управления сервером, отображает статус работы, а также предоставляет доступ к дополнительным функциям: просмотр статистики, журнала событий и импорт данных из Excel.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Методы класса \texttt{MainWindow} (\texttt{gui.py})\label{tab:class_mainwindow}}\\ \hline
+	\centrow Метод & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:class_mainwindow}}
+	\centrow Метод & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{\_\_init\_\_(self)} & public & Инициализация окна, создание элементов интерфейса \\ \hline
+	\texttt{start\_db(self)} & public & Запуск PostgreSQL и Flask-сервера \\ \hline
+	\texttt{stop\_db(self)} & public & Остановка Flask и PostgreSQL \\ \hline
+	\texttt{on\_close(self)} & public & Обработчик закрытия окна (корректное завершение) \\ \hline
+	\texttt{show\_statistics(self)} & public & Открывает окно со статистическим отчётом \\ \hline
+	\texttt{show\_logs(self)} & public & Открывает окно с журналом событий \\ \hline
+	\texttt{import\_excel(self)} & public & Запускает импорт данных из Excel-файла \\ \hline
+	\texttt{open\_users\_page(self)} & public & Открывает страницу управления пользователями в браузере \\ \hline
+	\texttt{run(self)} & public & Запускает главный цикл обработки событий Tkinter \\ \hline
+\end{xltabular}
+
+\subsubsection{Класс FlaskServerThread (поток веб-сервера)}
+
+Класс \texttt{FlaskServerThread} (модуль \texttt{gui.py}) наследуется от стандартного класса \texttt{Thread} библиотеки threading. Он предназначен для запуска веб-сервера Flask в отдельном потоке, что позволяет графическому интерфейсу оставаться отзывчивым во время работы сервера.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Методы класса \texttt{FlaskServerThread} (\texttt{gui.py})\label{tab:class_flaskthread}}\\ \hline
+	\centrow Метод & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:class_flaskthread}}
+	\centrow Метод & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{\_\_init\_\_(self, app, host, port)} & public & Инициализация потока с параметрами сервера \\ \hline
+	\texttt{run(self)} & public & Запускает веб-сервер (метод \texttt{serve\_forever}) \\ \hline
+	\texttt{shutdown(self)} & public & Корректно останавливает веб-сервер \\ \hline
+\end{xltabular}
+
+\subsubsection{Класс AppLogger (модуль логирования)}
+
+Класс \texttt{AppLogger} (модуль \texttt{logger.py}) реализует логирование событий приложения. Записи сохраняются в файл \texttt{app.log} с указанием временной метки и уровня важности, а также дублируются в консоль.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Методы класса \texttt{AppLogger} (\texttt{logger.py})\label{tab:class_logger}}\\ \hline
+	\centrow Метод & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:class_logger}}
+	\centrow Метод & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{\_\_init\_\_(self, log\_file)} & public & Инициализация логгера и настройка обработчиков \\ \hline
+	\texttt{info(self, message)} & public & Запись информационного сообщения \\ \hline
+	\texttt{error(self, message)} & public & Запись сообщения об ошибке \\ \hline
+	\texttt{warning(self, message)} & public & Запись предупреждения \\ \hline
+	\texttt{debug(self, message)} & public & Запись отладочного сообщения \\ \hline
+	\texttt{\_setup\_logger(self)} & private & Внутренняя настройка обработчиков логирования \\ \hline
+\end{xltabular}
+
+\subsubsection{Модуль app.py (веб-приложение Flask)}
+
+Модуль \texttt{app.py} является центральным компонентом серверной части. В нём определены все маршруты (URL-адреса) и соответствующие им функции-обработчики, а также вспомогательные функции для аутентификации и разграничения прав доступа. Ниже перечислены основные функции модуля.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Функции модуля \texttt{app.py}\label{tab:module_app}}\\ \hline
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:module_app}}
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{set\_db\_manager(manager)} & public & Устанавливает глобальный менеджер базы данных \\ \hline
+	\texttt{load\_user(user\_id)} & callback & Загружает пользователя из БД по идентификатору (для Flask-Login) \\ \hline
+	\texttt{admin\_required(f)} & decorator & Декоратор, ограничивающий доступ только для администраторов \\ \hline
+	\texttt{login()} & route & Обрабатывает вход пользователя (GET и POST) \\ \hline
+	\texttt{logout()} & route & Выполняет выход пользователя из системы \\ \hline
+	\texttt{index()} & route & Главная страница со списком слушателей и фильтрами \\ \hline
+	\texttt{add\_student()} & route & Добавление нового слушателя (GET и POST) \\ \hline
+	\texttt{edit\_student(student\_id)} & route & Редактирование данных слушателя (GET и POST) \\ \hline
+	\texttt{delete\_student(student\_id)} & route & Удаление слушателя \\ \hline
+	\texttt{admin\_users()} & route & Страница управления пользователями (только для админа) \\ \hline
+	\texttt{admin\_user\_add()} & route & Добавление нового пользователя (только для админа) \\ \hline
+	\texttt{admin\_user\_edit(user\_id)} & route & Редактирование пользователя (только для админа) \\ \hline
+	\texttt{admin\_user\_delete(user\_id)} & route & Удаление пользователя (только для админа) \\ \hline
+\end{xltabular}
+
+\subsubsection{Модуль crud.py (операции вставки и обновления)}
+
+Модуль \texttt{crud.py} содержит функции для добавления и редактирования записей о слушателях в базе данных. Все операции выполняются в рамках одной транзакции, что гарантирует целостность данных.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Функции модуля \texttt{crud.py}\label{tab:module_crud}}\\ \hline
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:module_crud}}
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{insert\_student\_from\_form
+		(form\_data, db\_manager)} & public & Добавляет нового слушателя и все связанные записи \\ \hline
+	\texttt{update\_student\_from\_form
+		(student\_id, form\_data, db\_manager)} & public & Обновляет данные слушателя и связанные записи \\ \hline
+\end{xltabular}
+
+\subsubsection{Модуль queries.py (запросы на выборку)}
+
+Модуль \texttt{queries.py} содержит функции для чтения данных из базы данных с учётом фильтрации и получения справочников.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Функции модуля \texttt{queries.py}\label{tab:module_queries}}\\ \hline
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:module_queries}}
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{get\_all\_students\_with\_filters(db\_manager, filters)} & public & Возвращает список слушателей с учётом фильтров \\ \hline
+	\texttt{get\_student\_by\_id(db\_manager, student\_id)} & public & Возвращает данные одного слушателя \\ \hline
+	\texttt{get\_dictionaries(db\_manager)} & public & Возвращает справочники для панели фильтров \\ \hline
+\end{xltabular}
+
+\subsubsection{Модуль validation.py (валидация данных)}
+
+Модуль \texttt{validation.py} выполняет проверку корректности данных, вводимых пользователем через веб-интерфейс или импортируемых из Excel-файлов.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Функции модуля \texttt{validation.py}\label{tab:module_validation}}\\ \hline
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:module_validation}}
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{validate\_student\_data(form\_data)} & public & Выполняет комплексную проверку всех полей формы \\ \hline
+	\texttt{validate\_snils(snils)} & public & Проверяет формат и контрольную сумму СНИЛС \\ \hline
+	\texttt{validate\_phone(phone)} & public & Проверяет формат номера телефона \\ \hline
+	\texttt{validate\_date(date\_str, field\_name)} & public & Проверяет формат даты \\ \hline
+	\texttt{validate\_birth\_date(date\_str)} & public & Проверяет корректность даты рождения \\ \hline
+	\texttt{validate\_cost(cost\_str)} & public & Проверяет стоимость обучения \\ \hline
+	\texttt{validate\_duration\_hours(hours\_str)} & public & Проверяет срок обучения в часах \\ \hline
+	\texttt{format\_validation\_errors(errors)} & public & Форматирует список ошибок для отображения \\ \hline
+\end{xltabular}
+
+\subsubsection{Модуль importer.py (импорт из Excel)}
+
+Модуль \texttt{importer.py} реализует чтение данных из Excel-файлов, сопоставление заголовков столбцов с ключами системы, валидацию и вставку записей в базу данных.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Функции модуля \texttt{importer.py}\label{tab:module_importer}}\\ \hline
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:module_importer}}
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{import\_from\_excel(file\_path, db\_manager)} & public & Выполняет импорт данных из Excel-файла \\ \hline
+	\texttt{load\_reference\_maps(db\_manager)} & public & Загружает справочники для сопоставления \\ \hline
+	\texttt{convert\_reference\_fields(form\_data, maps)} & public & Преобразует текстовые значения в идентификаторы \\ \hline
+\end{xltabular}
+
+\subsubsection{Модуль schema.py (инициализация базы данных)}
+
+Модуль \texttt{schema.py} вызывается однократно при первом запуске приложения. Он создаёт структуру всех таблиц, заполняет справочники начальными значениями и создаёт учётную запись администратора.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Функции модуля \texttt{schema.py}\label{tab:module_schema}}\\ \hline
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:module_schema}}
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{create\_all\_tables(conn)} & public & Создаёт все таблицы базы данных \\ \hline
+	\texttt{init\_dictionaries(conn)} & public & Заполняет справочники начальными значениями \\ \hline
+	\texttt{init\_admin\_user(conn)} & public & Создаёт учётную запись администратора \\ \hline
+\end{xltabular}
+
+\subsubsection{Модуль stats.py (статистика)}
+
+Модуль \texttt{stats.py} формирует сводный статистический отчёт по слушателям на основе запросов к базе данных.
+
+\begin{xltabular}{\textwidth}{|>{\raggedright\arraybackslash}p{6cm}|c|X|}
+	\caption{Функции модуля \texttt{stats.py}\label{tab:module_stats}}\\ \hline
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\endfirsthead
+	\continuecaption{Продолжение таблицы \ref{tab:module_stats}}
+	\centrow Функция & \centrow Доступ & \centrow Описание \\ \hline
+	\finishhead
+	\texttt{get\_statistics(db\_manager)} & public & Формирует словарь со статистическими показателями \\ \hline
+\end{xltabular}
+
+\subsection{Системное тестирование}
+
+В данном разделе представлены основные экраны разработанной программной системы, демонстрирующие её функциональность в соответствии с требованиями технического задания.
+
+% Здесь будут скриншоты
