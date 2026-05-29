@@ -147,31 +147,31 @@ Flask автоматически преобразует строку от бра
 
 Аналогично устроены все POST-маршруты: \texttt{/edit\_student/<id>} и \texttt{/admin/users/...}. Маршруты с методом GET либо отдают готовую HTML-страницу, либо выполняют действие (удаление) и делают редирект.
 
-\subsection{Проект базы данных программно-информационной системы}
+\subsubsection{Взаимодействие с базой данных}
 
-\subsubsection{Компоненты базы данных}
-
-Компоненты, отвечающие за хранение данных и взаимодействие с СУБД, показаны на рисунке~\ref{fig:db_comp}.
+Программные компоненты, отвечающие за управление встроенной СУБД и доступ к данным, функционируют на стороне сервера. Их состав и связи показаны на рисунке~\ref{fig:db_comp}.
 
 \begin{figure}[H]
 	\center{\includegraphics[scale=0.7]{db_component}}
-	\caption{Диаграмма компонентов базы данных}
+	\caption{Программные компоненты взаимодействия с СУБД}
 	\label{fig:db_comp}
 \end{figure}
 
-Внешней средой является СУБД PostgreSQL, встроенная через pgembed. Модуль \texttt{connection.py} управляет процессом PostgreSQL, создаёт пул соединений \texttt{ThreadedConnectionPool} (от 2 до 10 потокобезопасных соединений) и предоставляет методы \texttt{get\_connection()} и \texttt{return\_connection()} для остальных модулей.
+Модуль \texttt{connection.py} управляет процессом PostgreSQL, создаёт пул соединений \texttt{ThreadedConnectionPool} (от 2 до 10 потокобезопасных соединений) и предоставляет методы \texttt{get\_connection()} и \texttt{return\_connection()} для остальных модулей.
 
 Модуль \texttt{schema.py} вызывается однократно при первом запуске и выполняет создание всех таблиц, заполнение справочников и создание учётной записи администратора.
 
 Физически данные хранятся в подкаталоге \texttt{./pgdata} каталога приложения. При повторных запусках инициализация пропускается.
 
-\subsubsection{ER-модель данных}
+\subsection{Проект базы данных программно-информационной системы}
 
-На основе анализа предметной области были выделены основные сущности и связи между ними. ER-диаграмма (Entity-Relationship diagram, диаграмма «сущность-связь») представляет собой графическую схему, которая показывает, какие данные присутствуют в системе и как они связаны друг с другом. На рисунке \ref{er:image} представлена ER-диаграмма базы данных.
+\subsubsection{Концептуальная модель данных}
+
+На основе анализа предметной области были выделены основные сущности и связи между ними. ER-диаграмма (Entity-Relationship diagram, диаграмма «сущность-связь») представляет собой графическую схему, которая показывает, какие данные присутствуют в системе и как они связаны друг с другом. На рисунке \ref{er:image} представлена концептуальная модель данных.
 
 \begin{figure}[H]
 	\center{\includegraphics[width=1\linewidth]{er}}
-	\caption{ER-диаграмма базы данных}
+	\caption{Концептуальная модель данных}
 	\label{er:image}
 \end{figure}
 
@@ -194,7 +194,7 @@ Flask автоматически преобразует строку от бра
 В таблицах \ref{tab:students}--\ref{tab:users} приведено описание структуры таблиц базы данных.
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «students» (Слушатели)\label{tab:students}}\\ \hline
+	\caption{Схема таблицы «students» (Слушатели)\label{tab:students}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:students}}
@@ -213,7 +213,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «student\_status» (Статусы слушателей)\label{tab:student_status}}\\ \hline
+	\caption{Схема таблицы «student\_status» (Статусы слушателей)\label{tab:student_status}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:student_status}}
@@ -237,7 +237,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «prior\_education» (Предыдущее образование)\label{tab:prior_education}}\\ \hline
+	\caption{Схема таблицы «prior\_education» (Предыдущее образование)\label{tab:prior_education}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:prior_education}}
@@ -252,7 +252,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «education\_level» (Уровни образования)\label{tab:education_level}}\\ \hline
+	\caption{Схема таблицы «education\_level» (Уровни образования)\label{tab:education_level}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:education_level}}
@@ -263,7 +263,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «student\_group» (Связь слушателей с группами)\label{tab:student_group}}\\ \hline
+	\caption{Схема таблицы «student\_group» (Связь слушателей с группами)\label{tab:student_group}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:student_group}}
@@ -279,7 +279,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «groups» (Группы)\label{tab:groups}}\\ \hline
+	\caption{Схема таблицы «groups» (Группы)\label{tab:groups}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:groups}}
@@ -294,7 +294,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «programs» (Программы обучения)\label{tab:programs}}\\ \hline
+	\caption{Схема таблицы «programs» (Программы обучения)\label{tab:programs}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:programs}}
@@ -314,7 +314,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «program\_type» (Типы программ)\label{tab:program_type}}\\ \hline
+	\caption{Схема таблицы «program\_type» (Типы программ)\label{tab:program_type}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:program_type}}
@@ -325,7 +325,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «department» (Кафедры)\label{tab:department}}\\ \hline
+	\caption{Схема таблицы «department» (Кафедры)\label{tab:department}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:department}}
@@ -336,7 +336,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «learning\_form» (Формы обучения)\label{tab:learning_form}}\\ \hline
+	\caption{Схема таблицы «learning\_form» (Формы обучения)\label{tab:learning_form}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:learning_form}}
@@ -347,7 +347,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «professional\_field» (Области профессиональной деятельности)\label{tab:professional_field}}\\ \hline
+	\caption{Схема таблицы «professional\_field» (Области профессиональной деятельности)\label{tab:professional_field}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:professional_field}}
@@ -358,7 +358,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «economic\_activity» (Виды экономической деятельности)\label{tab:economic_activity}}\\ \hline
+	\caption{Схема таблицы «economic\_activity» (Виды экономической деятельности)\label{tab:economic_activity}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:economic_activity}}
@@ -369,7 +369,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «ugs» (Укрупнённые группы специальностей)\label{tab:ugs}}\\ \hline
+	\caption{Схема таблицы «ugs» (Укрупнённые группы специальностей)\label{tab:ugs}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:ugs}}
@@ -380,7 +380,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «qualification» (Квалификации)\label{tab:qualification}}\\ \hline
+	\caption{Схема таблицы «qualification» (Квалификации)\label{tab:qualification}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:qualification}}
@@ -391,7 +391,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «financing» (Финансирование)\label{tab:financing}}\\ \hline
+	\caption{Схема таблицы «financing» (Финансирование)\label{tab:financing}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:financing}}
@@ -406,7 +406,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «funding\_source» (Источники финансирования)\label{tab:funding_source}}\\ \hline
+	\caption{Схема таблицы «funding\_source» (Источники финансирования)\label{tab:funding_source}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:funding_source}}
@@ -417,7 +417,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «customer\_type» (Типы заказчиков)\label{tab:customer_type}}\\ \hline
+	\caption{Схема таблицы «customer\_type» (Типы заказчиков)\label{tab:customer_type}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:customer_type}}
@@ -428,7 +428,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «documents» (Документы о квалификации)\label{tab:documents}}\\ \hline
+	\caption{Схема таблицы «documents» (Документы о квалификации)\label{tab:documents}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:documents}}
@@ -446,7 +446,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «document\_type» (Виды документов)\label{tab:document_type}}\\ \hline
+	\caption{Схема таблицы «document\_type» (Виды документов)\label{tab:document_type}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:document_type}}
@@ -457,7 +457,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «document\_status» (Статусы документов)\label{tab:document_status}}\\ \hline
+	\caption{Схема таблицы «document\_status» (Статусы документов)\label{tab:document_status}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:document_status}}
@@ -468,7 +468,7 @@ Flask автоматически преобразует строку от бра
 \end{xltabular}
 
 \begin{xltabular}{\textwidth}{|c|c|l|l|X|}
-	\caption{Атрибуты таблицы «users» (Пользователи системы)\label{tab:users}}\\ \hline
+	\caption{Схема таблицы «users» (Пользователи системы)\label{tab:users}}\\ \hline
 	\centrow Key Type & \centrow Optionality & \centrow Column name & \centrow Data Type & \centrow Size \\ \hline
 	\endfirsthead
 	\continuecaption{Продолжение таблицы \ref{tab:users}}
